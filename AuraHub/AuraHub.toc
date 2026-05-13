@@ -1,0 +1,25 @@
+## Interface: 30300
+## Title: |cff4db8ffAuraHub|r
+## Notes: Personal UI Backup and Restore Manager
+## Author: beowned
+## Version: 2.0.0
+## SavedVariables: AuraHubDB
+
+localization\localization.en.lua
+localization\localization.ru.lua
+Helpers.lua
+Data.lua
+Core.lua
+WeakAuras.lua
+Importer.lua
+Queue.lua
+UI.lua
+Minimap.lua
+Pages\Main.lua
+Pages\WeakAuras.lua
+Pages\ElvUI.lua
+Pages\Skada.lua
+Pages\Binds.lua
+Pages\Macros.lua
+Pages\ActionBars.lua
+Pages\Help.lua
