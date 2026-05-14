@@ -53,6 +53,12 @@ function P.Refresh()
         nameFs:SetJustifyH("LEFT")
 
         local count = entry.data and #entry.data or 0
+        local formTag = ""
+        if entry.formName and entry.formName ~= "" then
+            formTag = "  |cff88aaff[" .. entry.formName .. "]|r"
+        elseif (entry.form or 0) > 0 then
+            formTag = "  |cff88aaff[Form " .. entry.form .. "]|r"
+        end
         local metaFs = card:CreateFontString(nil, "OVERLAY")
         metaFs:SetPoint("BOTTOMLEFT", card, "BOTTOMLEFT", 10, 9)
         UI.SetFont(metaFs, 13)
@@ -60,7 +66,7 @@ function P.Refresh()
             count,
             H.Plural(count, L["WORD_SLOT"], L["WORD_SLOT_FEW"], L["WORD_SLOTS"]),
             H.TimeAgo(entry.savedAt)
-        ))
+        ) .. formTag)
 
         local restoreBtn = UI.CreateMenuButton(card, L["BTN_RESTORE"], 88, 28, function()
             AuraHub.Core._restorePending = function()
@@ -110,17 +116,18 @@ local function SaveCurrentBars()
         end
 
         local slots = {}
-        for slot = 1, 72 do
+        for slot = 1, 132 do
             local aType, aId = GetActionInfo(slot)
-            if aType == "spell" then
+            if aType == "spell" and (aId or 0) > 0 then
                 local sName, sRank = "", ""
                 if GetSpellInfo then
-                    -- aId from GetActionInfo is a spellbook slot, not a spell ID
                     sName, sRank = GetSpellInfo(aId, "spell")
                     sName = sName or ""
                     sRank = sRank or ""
                 end
-                slots[#slots + 1] = { slot = slot, type = "spell", id = aId, name = sName, rank = sRank }
+                if sName ~= "" then
+                    slots[#slots + 1] = { slot = slot, type = "spell", id = aId, name = sName, rank = sRank }
+                end
             elseif aType == "item" then
                 local iName = GetItemInfo and GetItemInfo(aId) or ""
                 slots[#slots + 1] = { slot = slot, type = "item", id = aId, name = iName or "" }
@@ -130,10 +137,19 @@ local function SaveCurrentBars()
             end
         end
 
+        local form     = GetShapeshiftForm and GetShapeshiftForm() or 0
+        local formName = ""
+        if form > 0 and GetShapeshiftFormInfo then
+            local _, fname = GetShapeshiftFormInfo(form)
+            formName = fname or ""
+        end
+
         AuraHub.Data.SaveActionBar({
-            name    = name,
-            savedAt = time(),
-            data    = slots,
+            name     = name,
+            savedAt  = time(),
+            form     = form,
+            formName = formName,
+            data     = slots,
         })
         P.Refresh()
         H.Print(L["BARS_PRINT_SAVED"]:format(name, #slots))

@@ -284,17 +284,9 @@ end
 
 -- ActionBars — restore saved action bar slot layout
 
-function I.RestoreActionBars(entry)
+local function _ApplyActionBars(entry)
     local L = AuraHub.L
     local H = AuraHub.Helpers
-    if type(entry.data) ~= "table" then
-        H.Err(L["IMP_BARS_ERR_NO_DATA"])
-        return
-    end
-    if InCombatLockdown() then
-        H.Err(L["IMP_BARS_ERR_COMBAT"])
-        return
-    end
 
     local restored = 0
     local skipped  = 0
@@ -349,38 +341,29 @@ function I.RestoreActionBars(entry)
                 end
                 if not placed then pcall(PickupMacro, s.id) end
             end
-            local cType, cId = GetCursorInfo()
+            local cType = GetCursorInfo()
             if cType then
-                H.Print(string.format("  slot %d <- %s id=%s name=%s [cursor %s/%s]",
-                    s.slot, s.type, tostring(s.id), tostring(s.name), tostring(cType), tostring(cId)), "888888")
                 PlaceAction(s.slot)
-                -- No ClearCursor here: calling it after PlaceAction on an empty slot
-                -- cancels the placement on this client. The next iteration's ClearCursor
-                -- (at the top of the loop) will clear any displaced item from a swap.
                 restored = restored + 1
             else
-                H.Print(string.format("  slot %d SKIP %s id=%s name=%s",
-                    s.slot, s.type, tostring(s.id), tostring(s.name)), "ff6644")
                 skipped = skipped + 1
             end
         end)
     end
     pcall(ClearCursor)
-    H.Print(string.format("Done: %d placed, %d skipped", restored, skipped), restored > 0 and "44ff44" or "ff4444")
-
-    -- Verify: read back each slot and compare to saved
-    local vOk, vWrong = 0, 0
-    for _, s in ipairs(entry.data) do
-        local aType, aId = GetActionInfo(s.slot)
-        if aType == s.type then
-            vOk = vOk + 1
-        else
-            H.Print(string.format("  VERIFY slot %d: want %s/%s  got %s/%s",
-                s.slot, s.type, tostring(s.id), tostring(aType), tostring(aId)), "ff6644")
-            vWrong = vWrong + 1
-        end
-    end
-    H.Print(string.format("Verify: %d ok, %d wrong", vOk, vWrong), vWrong == 0 and "44ff44" or "ff8844")
-
     H.Print(L["IMP_BARS_RESTORED"]:format(entry.name or "?", restored))
+end
+
+function I.RestoreActionBars(entry)
+    local L = AuraHub.L
+    local H = AuraHub.Helpers
+    if type(entry.data) ~= "table" then
+        H.Err(L["IMP_BARS_ERR_NO_DATA"])
+        return
+    end
+    if InCombatLockdown() then
+        H.Err(L["IMP_BARS_ERR_COMBAT"])
+        return
+    end
+    _ApplyActionBars(entry)
 end

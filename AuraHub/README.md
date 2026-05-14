@@ -43,8 +43,6 @@ World of Warcraft\
         └── AuraHub\        ← put the folder here
             ├── AuraHub.toc
             ├── Core.lua
-            ├── SyncAuraHub.bat
-            ├── SyncAuraHub.ps1
             └── ...
 ```
 
@@ -52,15 +50,20 @@ Enable **AuraHub** on the character select screen under AddOns.
 
 ### 2 — Set up multi-account sync (optional)
 
-The sync scripts are included inside the addon folder. **No extra files need to be placed anywhere** — they work from their location inside `AuraHub\`.
+Place both sync files directly in your **WoW root folder** (the same folder as `Wow.exe`):
 
 ```
-World of Warcraft\Interface\AddOns\AuraHub\
-├── SyncAuraHub.bat    ← double-click this to run the sync
-└── SyncAuraHub.ps1    ← the actual merge logic (called by the .bat)
+World of Warcraft\
+├── Wow.exe
+├── SyncAuraHub.bat     ← place here
+├── SyncAuraHub.ps1     ← place here
+├── WTF\
+└── Interface\
+    └── AddOns\
+        └── AuraHub\
 ```
 
-> **Both files must stay in the same folder.** The `.bat` calls the `.ps1` automatically. Do not move them separately.
+> **Both files must be in the WoW root folder** next to `Wow.exe`. The script locates `WTF\Account\` relative to its own location. The `.bat` calls the `.ps1` automatically — do not move them separately.
 
 ---
 
@@ -205,35 +208,6 @@ If you later re-save an entry with the same name, the tombstone is cleared and t
 | `/aurahub pathtest AccountName` | Test which file paths are accessible |
 
 ---
-
-## File Structure
-
-```
-AuraHub/
-├── AuraHub.toc                  — Addon manifest (interface 30300)
-├── SyncAuraHub.bat              — Double-click to run the multi-account sync
-├── SyncAuraHub.ps1              — Merge logic (PowerShell 5.1+)
-├── Core.lua                     — Initialization, events, slash commands
-├── Data.lua                     — SavedVariables CRUD and tombstone system
-├── Helpers.lua                  — Utility functions (serialize, time, plurals)
-├── Importer.lua                 — Restores profiles into their target addons
-├── Minimap.lua                  — Minimap button
-├── Queue.lua                    — Load Queue (stage multiple restores)
-├── UI.lua                       — Main frame, nav bar, widget factory
-├── WeakAuras.lua                — WeakAuras database interface
-├── localization/
-│   ├── localization.en.lua      — English strings (default, always loaded)
-│   └── localization.ru.lua      — Russian overrides (ruRU clients)
-└── Pages/
-    ├── Main.lua                 — Home page (summary + multi-account dialog)
-    ├── WeakAuras.lua            — WeakAuras tab
-    ├── ElvUI.lua                — ElvUI tab
-    ├── Skada.lua                — Skada tab
-    ├── Binds.lua                — Keybinds tab
-    ├── Macros.lua               — Macros tab
-    ├── ActionBars.lua           — Bars tab
-    └── Help.lua                 — Help & About tab
-```
 
 ---
 
