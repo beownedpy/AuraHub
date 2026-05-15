@@ -170,6 +170,7 @@ The script will:
 - List all accounts found under `WTF\Account\` with their file sizes.
 - Ask for confirmation before making any changes.
 - Back up each account's `AuraHub.lua` as `AuraHub.lua.bak` before writing.
+- Save an external backup to `Documents\AuraHubBackup\` (used by `RestoreAuraHub.bat`).
 
 **Step 4 — Log into any account**
 
@@ -191,6 +192,54 @@ Repeat steps 1–3 whenever you update your profiles and want them synced.
 When you delete an entry inside AuraHub (via the **×** button), a tombstone is recorded with a timestamp. The sync script reads tombstones from **all** accounts and removes the matching entry everywhere — it will not come back after syncing.
 
 If you later re-save an entry with the same name, the tombstone is cleared and the new entry survives future syncs normally.
+
+---
+
+## External Backup & Restore
+
+AuraHub profiles are stored inside the WoW `WTF` folder. If you reinstall the game or wipe that folder, your profiles would normally be lost. The external backup system solves this by saving a copy of your data to `Documents\AuraHubBackup\` every time you run the sync script.
+
+### Files
+
+| File | Purpose |
+|---|---|
+| `SyncAuraHub.bat` | Merges profiles across accounts **and** saves an external backup |
+| `RestoreAuraHub.bat` | Restores profiles from an external backup |
+| `RestoreAuraHub.ps1` | Script called by `RestoreAuraHub.bat` |
+
+All three files must be in the **WoW root folder** (next to `Wow.exe`).
+
+### How backups are created
+
+Every time you run `SyncAuraHub.bat`, the merged result is automatically saved to:
+
+```
+C:\Users\<YOU>\Documents\AuraHubBackup\AuraHub_2026-05-15_14-30-00.lua
+```
+
+All backups are kept — nothing is deleted automatically.
+
+### How to restore
+
+**Same PC, different WoW installation:**
+
+1. Copy `RestoreAuraHub.bat` and `RestoreAuraHub.ps1` into the root of the other WoW folder.
+2. Log into WoW once so the `WTF\Account\` folders are created, then exit.
+3. Double-click **`RestoreAuraHub.bat`**.
+4. Press **Enter** to select the latest backup (or type a number to choose an older one).
+5. Confirm — the script writes the backup to every account under `WTF\Account\`.
+6. Log in — all profiles are available.
+
+**After reinstalling WoW on the same PC:**
+
+Follow the same steps above. The backup in `Documents\AuraHubBackup\` is not affected by reinstalling the game.
+
+**Moving to a different PC:**
+
+1. Copy `AuraHub_*.lua` from `Documents\AuraHubBackup\` to the same folder on the new PC.
+2. Follow the restore steps above.
+
+> The backup reflects the state at the time `SyncAuraHub.bat` was last run. Run the sync script after any major session to keep the backup up to date.
 
 ---
 
